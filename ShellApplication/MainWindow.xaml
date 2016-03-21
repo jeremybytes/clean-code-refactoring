@@ -1,0 +1,13 @@
+﻿<Window x:Class="ShellApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:catalog="clr-namespace:Module.Catalog;assembly=Module.Catalog"
+        Title="Refactoring Basics" Height="550" Width="765">
+    <Border x:Name="LayoutRoot" Padding="5"
+            BorderBrush="{StaticResource ApplicationForeground}" BorderThickness="2" 
+            Background="{StaticResource ApplicationBackground}">
+        <Grid x:Name="Shell">
+
+        </Grid>
+    </Border>
+</Window>
