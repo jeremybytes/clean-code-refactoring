@@ -66,6 +66,11 @@ namespace Module.Catalog
             }
         }
 
+        public bool IsCacheValid
+        {
+            get { return DateTime.Now - LastUpdateTime < TimeSpan.FromSeconds(10); }
+        }
+
         #region Filters
 
         public bool Include70s
@@ -156,7 +161,7 @@ namespace Module.Catalog
 
         public void RefreshCatalog()
         {
-            if (DateTime.Now - LastUpdateTime < TimeSpan.FromSeconds(10))
+            if (IsCacheValid)
             {
                 ResetFiltersToDefaults();
             }
