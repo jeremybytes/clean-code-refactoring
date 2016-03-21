@@ -133,16 +133,25 @@ namespace Module.Catalog
 
         public void Initialize()
         {
-            if (!_container.IsRegistered<IPersonService>())
-                throw new MissingFieldException(
-                    "IPersonService is not available from the DI Container");
-            _service = _container.Resolve<IPersonService>();
+            _service = GetServiceFromContainer();
+            _model = GetModelFromContainer();
+            RefreshCatalog();
+        }
 
+        private CatalogOrder GetModelFromContainer()
+        {
             if (!_container.IsRegistered<CatalogOrder>("CurrentOrder"))
                 throw new MissingFieldException(
                     "CurrentOrder is not available from the DI Container");
-            _model = _container.Resolve<CatalogOrder>("CurrentOrder");
-            RefreshCatalog();
+            return _container.Resolve<CatalogOrder>("CurrentOrder");
+        }
+
+        private IPersonService GetServiceFromContainer()
+        {
+            if (!_container.IsRegistered<IPersonService>())
+                throw new MissingFieldException(
+                    "IPersonService is not available from the DI Container");
+            return _container.Resolve<IPersonService>();
         }
 
         public void RefreshCatalog()
