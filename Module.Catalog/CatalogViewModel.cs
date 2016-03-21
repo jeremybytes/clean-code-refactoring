@@ -241,13 +241,13 @@ namespace Module.Catalog
 
             IEnumerable<Person> people = _fullPeopleList;
             if (!Include70s)
-                people = people.Where(p => p.StartDate.Year / 10 != 197);
+                people = people.Where(p => p.StartDecade != 1970);
             if (!Include80s)
-                people = people.Where(p => p.StartDate.Year / 10 != 198);
+                people = people.Where(p => p.StartDecade != 1980);
             if (!Include90s)
-                people = people.Where(p => p.StartDate.Year / 10 != 199);
+                people = people.Where(p => p.StartDecade != 1990);
             if (!Include00s)
-                people = people.Where(p => p.StartDate.Year / 10 != 200);
+                people = people.Where(p => p.StartDecade != 2000);
 
             Catalog = people.ToList();
         }
