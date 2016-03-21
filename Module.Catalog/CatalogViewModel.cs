@@ -158,11 +158,7 @@ namespace Module.Catalog
         {
             if (DateTime.Now - LastUpdateTime < TimeSpan.FromSeconds(10))
             {
-                _include70s = true;
-                _include80s = true;
-                _include90s = true;
-                _include00s = true;
-                RefreshFilter();
+                ResetFiltersToDefaults();
             }
             else
             {
@@ -174,11 +170,7 @@ namespace Module.Catalog
                 task.ContinueWith(t =>
                     {
                         _fullPeopleList = t.Result;
-                        _include70s = true;
-                        _include80s = true;
-                        _include90s = true;
-                        _include00s = true;
-                        RefreshFilter();
+                        ResetFiltersToDefaults();
                         LastUpdateTime = DateTime.Now;
                     }, TaskContinuationOptions.NotOnFaulted);
 
@@ -189,6 +181,15 @@ namespace Module.Catalog
                     uiDispatcher.Invoke(rtxDel, rp.Exception.InnerException);
                 }, TaskContinuationOptions.OnlyOnFaulted);
             }
+        }
+
+        private void ResetFiltersToDefaults()
+        {
+            _include70s = true;
+            _include80s = true;
+            _include90s = true;
+            _include00s = true;
+            RefreshFilter();
         }
 
         public void AddToSelection(object person)
