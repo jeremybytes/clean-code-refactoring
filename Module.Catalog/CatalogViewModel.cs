@@ -143,6 +143,14 @@ namespace Module.Catalog
             RefreshCatalog();
         }
 
+        public void RefreshCatalog()
+        {
+            if (IsCacheValid)
+                ResetFiltersToDefaults();
+            else
+                RefreshCatalogFromService();
+        }
+
         private CatalogOrder GetModelFromContainer()
         {
             if (!_container.IsRegistered<CatalogOrder>("CurrentOrder"))
@@ -159,33 +167,31 @@ namespace Module.Catalog
             return _container.Resolve<IPersonService>();
         }
 
-        public void RefreshCatalog()
+        private void RefreshCatalogFromService()
         {
-            if (IsCacheValid)
+            Catalog = new List<Person>();
+
+            var asyncBegin = _service.BeginGetPeople(null, null);
+            var task = Task<List<Person>>.Factory.FromAsync(
+                asyncBegin, _service.EndGetPeople);
+            task.ContinueWith(t =>
             {
+                _fullPeopleList = t.Result;
                 ResetFiltersToDefaults();
-            }
-            else
+                LastUpdateTime = DateTime.Now;
+            }, TaskContinuationOptions.NotOnFaulted);
+
+            RethrowExceptionsOnMainThread(task);
+        }
+
+        private static void RethrowExceptionsOnMainThread(Task<List<Person>> task)
+        {
+            Action<Exception> rtxDel = (ex) => { throw ex; };
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
+            task.ContinueWith(rp =>
             {
-                Catalog = new List<Person>();
-
-                var asyncBegin = _service.BeginGetPeople(null, null);
-                var task = Task<List<Person>>.Factory.FromAsync(
-                    asyncBegin, _service.EndGetPeople);
-                task.ContinueWith(t =>
-                    {
-                        _fullPeopleList = t.Result;
-                        ResetFiltersToDefaults();
-                        LastUpdateTime = DateTime.Now;
-                    }, TaskContinuationOptions.NotOnFaulted);
-
-                Action<Exception> rtxDel = (ex) => { throw ex; };
-                var uiDispatcher = Dispatcher.CurrentDispatcher;
-                task.ContinueWith(rp =>
-                {
-                    uiDispatcher.Invoke(rtxDel, rp.Exception.InnerException);
-                }, TaskContinuationOptions.OnlyOnFaulted);
-            }
+                uiDispatcher.Invoke(rtxDel, rp.Exception.InnerException);
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         private void ResetFiltersToDefaults()
